@@ -23,10 +23,20 @@ class Timelapse_Addon_Properties(bpy.types.PropertyGroup):
         ),
         default='PNG'
     )
-    
-    file_path: bpy.props.StringProperty(
+
+    num_screenshots: bpy.props.IntProperty(
         name="",
-        description="timelapse screenshot output",
+        default=0
+    )
+
+    screenshot_is_due: bpy.props.BoolProperty(
+        name="",
+        default=False
+    )
+
+    dir_path: bpy.props.StringProperty(
+        name="",
+        description="timelapse screenshot output directory path",
         default="./timelapse_screenshots",
         # maxlen=1024,
         subtype='DIR_PATH'

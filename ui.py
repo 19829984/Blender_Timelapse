@@ -1,5 +1,7 @@
 import bpy
-from .timelapse import Timelapse_OT_timelapse_operator
+from .timelapse import Timelapse_OT_start_timelapse_modal_operator as timelapse_ot_start
+from .timelapse import Timelapse_OT_end_timelapse_modal_operator as timelapse_ot_end
+
 
 class OUTPUT_PT_timelapse_panel(bpy.types.Panel):
     bl_idname = "OUTPUT_PT_timelapse_panel"
@@ -15,15 +17,15 @@ class OUTPUT_PT_timelapse_panel(bpy.types.Panel):
         row = layout.row(align=True)
         row.label(text="Path to timelapse output:")
         row = layout.row(align=True)
-        row.prop(tl, "file_path")
+        row.prop(tl, "dir_path")
 
         row = layout.row(align=True)
         row.label(text="Seconds per Frame")
         row.prop(tl, 'seconds_per_frame')
 
         row = layout.row(align=True)
-        row.operator(Timelapse_OT_timelapse_operator.bl_idname)
-
+        row.operator(timelapse_ot_start.bl_idname, text="Start Timelapse")
+        row.operator(timelapse_ot_end.bl_idname, text="End Timelapse")
 
 
 def register():
