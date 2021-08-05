@@ -2,12 +2,6 @@ import bpy
 import functools
 from .events import events
 
-#TODO: Make modal operator automatically restart, or prompt user to resume modal operator. 
-#       If user close and reopens file while timelapse is running, is_running remains True, but 
-#       modal operator does not resume automatically. 
-
-#If user does not save, neither does our properties. So next time the screenshots will start at
-#somepoint before the last screenshot taken, and start overwritting the next ones. This shouldn't be a problem.
 def screenshot_timer(tl, seconds):
     tl.screenshot_is_due = True
     print("Screenshot time")
@@ -31,6 +25,10 @@ class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
         tl = context.scene.tl
 
         if not tl.is_running:
+            if Timelapse_OT_start_timelapse_modal_operator.registered_timer_func is not None:
+                print("Unregistered timer")
+                bpy.app.timers.unregister(
+                    Timelapse_OT_start_timelapse_modal_operator.registered_timer_func)
             return {'FINISHED'}
             
         tl.is_running = True
@@ -58,9 +56,10 @@ class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
         tl.is_running = True
         self.report({"INFO"}, "Timelapse started")
 
-        if start_timelapse_cls.registered_timer_func is None:
-            start_timelapse_cls.registered_timer_func = functools.partial(
-                screenshot_timer, tl, tl.seconds_per_frame)
+        
+        print("Registering timer with: " + str(tl.seconds_per_frame))
+        start_timelapse_cls.registered_timer_func = functools.partial(
+            screenshot_timer, tl, tl.seconds_per_frame)
 
         bpy.app.timers.register(
             start_timelapse_cls.registered_timer_func)
@@ -88,9 +87,6 @@ class Timelapse_OT_end_timelapse_modal_operator(bpy.types.Operator):
         if tl.is_running:
             tl.is_running = False
             self.report({"INFO"}, "Timelapse cancelled")
-            if Timelapse_OT_start_timelapse_modal_operator.registered_timer_func is not None:
-                bpy.app.timers.unregister(
-                    Timelapse_OT_start_timelapse_modal_operator.registered_timer_func)
             return {'FINISHED'}
 
         self.report({'WARNING'}, "No timelapse is being recorded.")
@@ -99,6 +95,7 @@ class Timelapse_OT_end_timelapse_modal_operator(bpy.types.Operator):
 
 classes = [Timelapse_OT_start_timelapse_modal_operator,
            Timelapse_OT_end_timelapse_modal_operator]
+
 
 
 def register():
