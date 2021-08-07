@@ -34,6 +34,31 @@ class Timelapse_Addon_Properties(bpy.types.PropertyGroup):
         default=False
     )
 
+    remembered_choice: bpy.props.EnumProperty(
+        items=[
+            (
+                'no_memory',
+                "No Memory",
+                "No remembered auto resume choice",
+                0
+            ),
+            (
+                "auto_resume",
+                "Auto Resume",
+                "Always automatically resume timelapse",
+                1
+            ),
+            (
+                "do_not_resume",
+                "Do not resume",
+                "Do not auotmatically resume",
+                2
+            )
+            ],
+        name="",
+        default="no_memory"
+    )
+
     dir_path: bpy.props.StringProperty(
         name="",
         description="timelapse screenshot output directory path",

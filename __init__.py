@@ -29,25 +29,38 @@ bl_info = {
 modules = {properties, timelapse, ui}
 
 @persistent
-def start_modal_if_is_running(dummy):
-    print("Checking is_running...")
+def check_timelapse_is_running_and_prompt(dummy):
     for scene in bpy.data.scenes:
         tl = scene.get('tl', None)
         print(tl.keys())
         if tl is not None:
-            print("Timelapse already running, starting modal")
-            tl['is_running'] = False #So that the start modal will run
-            bpy.ops.timelapse.start_modal_operator()
-            break
+            if tl.get('is_running') == True:
+                print("Timelapse already running")
+                if tl.get('remembered_choice') is not None:
+                    print("Choice", tl.get('remembered_choice'))
+                    if tl['remembered_choice'] == 1: #auto_resume
+                        print("Autoresume detected")
+                        tl['is_running'] = False #So that the modal will run
+                        bpy.ops.timelapse.start_modal_operator()
+                    elif tl['remembered_choice'] == 0: #no memory
+                        print("No memory")
+                        bpy.ops.wm.timelapse_remind("INVOKE_DEFAULT")
+                    break
+                else:
+                    print("No memory")
+                    bpy.ops.wm.timelapse_remind("INVOKE_DEFAULT")
+                    break
+
+
 
 
 def register():
     for module in modules:
         module.register()
-    bpy.app.handlers.load_post.append(start_modal_if_is_running)
+    bpy.app.handlers.load_post.append(check_timelapse_is_running_and_prompt)
 
 
 def unregister():
     for module in modules:
         module.unregister()
-    bpy.app.handlers.load_post.remove(start_modal_if_is_running)
+    bpy.app.handlers.load_post.remove(check_timelapse_is_running_and_prompt)

@@ -18,17 +18,10 @@ class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
     def __init__(self):
         self.report({'INFO'}, "Starting Timelapse")
 
-    def __del__(self):
-        self.report({'INFO'}, "Timelapse Started")
-
     def modal(self, context, event):
         tl = context.scene.tl
 
         if not tl.is_running:
-            if Timelapse_OT_start_timelapse_modal_operator.registered_timer_func is not None:
-                print("Unregistered timer")
-                bpy.app.timers.unregister(
-                    Timelapse_OT_start_timelapse_modal_operator.registered_timer_func)
             return {'FINISHED'}
             
         tl.is_running = True
@@ -37,8 +30,13 @@ class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
             if tl.screenshot_is_due:
                 self.report(
                     {"INFO"}, ("Taking {}th screenshot".format(tl.num_screenshots)))
-                bpy.ops.screen.screenshot(
-                    filepath="{}test-{}.png".format(tl.dir_path, str(tl.num_screenshots)))
+                try:
+                    bpy.ops.screen.screenshot(
+                        filepath="{}test-{}.png".format(tl.dir_path, str(tl.num_screenshots)))
+                except RuntimeError:
+                    self.report({"ERROR"}, tl.dir_path + " is invalid!")
+                    bpy.ops.timelapse.end_modal_operator()
+                    return {'FINISHED'}
                 tl.num_screenshots += 1
                 tl.screenshot_is_due = False
 
@@ -51,18 +49,22 @@ class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
             self.report({"INFO"}, "Timelapse already started!")
             return {'PASS_THROUGH'}
 
-        start_timelapse_cls = Timelapse_OT_start_timelapse_modal_operator
+        start_modal_cls = Timelapse_OT_start_timelapse_modal_operator
 
         tl.is_running = True
         self.report({"INFO"}, "Timelapse started")
 
         
         print("Registering timer with: " + str(tl.seconds_per_frame))
-        start_timelapse_cls.registered_timer_func = functools.partial(
+        if start_modal_cls.registered_timer_func is not None and bpy.app.timers.is_registered(start_modal_cls.registered_timer_func):
+            bpy.app.timers.unregister(
+                start_modal_cls.registered_timer_func)
+
+        start_modal_cls.registered_timer_func = functools.partial(
             screenshot_timer, tl, tl.seconds_per_frame)
 
         bpy.app.timers.register(
-            start_timelapse_cls.registered_timer_func)
+            start_modal_cls.registered_timer_func)
 
         context.window_manager.modal_handler_add(self)
         return {'RUNNING_MODAL'}
@@ -78,17 +80,22 @@ class Timelapse_OT_end_timelapse_modal_operator(bpy.types.Operator):
     def __init__(self):
         self.report({'INFO'}, "Ending Timelapse")
 
-    def __del__(self):
-        self.report({'INFO'}, "Timelapse Ended")
 
     def execute(self, context):
         tl = context.scene.tl
+
+        start_modal_cls = Timelapse_OT_start_timelapse_modal_operator
+        
+        if start_modal_cls.registered_timer_func is not None and bpy.app.timers.is_registered(start_modal_cls.registered_timer_func):
+            print("Unregistered timer")
+            bpy.app.timers.unregister(
+                start_modal_cls.registered_timer_func)
 
         if tl.is_running:
             tl.is_running = False
             self.report({"INFO"}, "Timelapse cancelled")
             return {'FINISHED'}
-
+                
         self.report({'WARNING'}, "No timelapse is being recorded.")
         return {'FINISHED'}
 
