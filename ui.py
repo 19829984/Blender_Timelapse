@@ -25,17 +25,27 @@ class OUTPUT_PT_timelapse_panel(bpy.types.Panel):
         row = layout.row(align=True)
         row.label(text="Path to timelapse output:")
         row.label(text="#Screenshots so far: {}".format(tl.num_screenshots))
+        
         row = layout.row(align=True)
         row.prop(tl, "dir_path")
+        row.enabled = not tl.is_running
+
+        row = layout.row(align=True)
+        row.prop(tl, "output_name")
+        row.enabled = not tl.is_running
+
+        row = layout.row(align=True)
+        row.prop(tl, "file_format")
+        row.enabled = not tl.is_running
 
         row = layout.row(align=True)
         row.label(text="Seconds per Frame")
         row.prop(tl, 'seconds_per_frame')
+        row.enabled = not tl.is_running
 
         row = layout.row(align=True)
         row.operator(timelapse_ot_start.bl_idname, text="Start Timelapse")
         row.operator(timelapse_ot_end.bl_idname, text="End Timelapse")
-
 
 class WM_OT_If_Timelapse_On_Remind(bpy.types.Operator):
     bl_label = "Resume timelapse recording from previous session?"
@@ -47,13 +57,15 @@ class WM_OT_If_Timelapse_On_Remind(bpy.types.Operator):
         name="Remember my choice and don't remind me again", default=False)
 
     def execute(self, context):
+        tl = context.scene.tl
         if self.resume_timelapse:
+            bpy.ops.timelapse.end_modal_operator()
             bpy.ops.timelapse.start_modal_operator()
+            
         if self.dont_remind_me:
-            if self.resume_timelapse:
-                context.scene.tl.remembered_choice = "auto_resume"
-            else:
-                context.scene.tl.remembered_choice = "do_not_resume"
+            tl.auto_resume = self.resume_timelapse
+        
+        tl.remind_resume = not self.dont_remind_me
 
         return {'FINISHED'}
 

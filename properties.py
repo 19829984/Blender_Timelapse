@@ -1,6 +1,5 @@
 import bpy
 
-
 class Timelapse_Addon_Properties(bpy.types.PropertyGroup):
     seconds_per_frame: bpy.props.FloatProperty(
         name="",
@@ -11,17 +10,22 @@ class Timelapse_Addon_Properties(bpy.types.PropertyGroup):
         unit="TIME"
     )
 
+    output_name: bpy.props.StringProperty(
+        name="Output Name",
+        description="Name of the output files",
+        default='timelapse-screenshot'
+    )
+
     file_format: bpy.props.EnumProperty(
         name="File Format",
         items=(
-            ('PNG', 'PNG', ''),
-            ('BMP', 'BMP', ''),
-            ('JPEG', 'JPEG', ''),
-            ('TIFF', 'TIFF', ''),
-            ('TARGA', 'Targa', ''),
-            ('OPEN_EXR', 'OpenEXR', ''),
+            ('png', 'PNG', ''),
+            ('bmp', 'BMP', ''),
+            ('jpeg', 'JPEG', ''),
+            ('tiff', 'TIFF', ''),
+            ('exr', 'OpenEXR', ''),
         ),
-        default='PNG'
+        default='png'
     )
 
     num_screenshots: bpy.props.IntProperty(
@@ -34,29 +38,14 @@ class Timelapse_Addon_Properties(bpy.types.PropertyGroup):
         default=False
     )
 
-    remembered_choice: bpy.props.EnumProperty(
-        items=[
-            (
-                'no_memory',
-                "No Memory",
-                "No remembered auto resume choice",
-                0
-            ),
-            (
-                "auto_resume",
-                "Auto Resume",
-                "Always automatically resume timelapse",
-                1
-            ),
-            (
-                "do_not_resume",
-                "Do not resume",
-                "Do not auotmatically resume",
-                2
-            )
-            ],
+    remind_resume: bpy.props.BoolProperty(
         name="",
-        default="no_memory"
+        default=True
+    )
+
+    auto_resume: bpy.props.BoolProperty(
+        name="",
+        default=False,
     )
 
     dir_path: bpy.props.StringProperty(

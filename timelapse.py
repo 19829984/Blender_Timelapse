@@ -32,7 +32,7 @@ class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
                     {"INFO"}, ("Taking {}th screenshot".format(tl.num_screenshots)))
                 try:
                     bpy.ops.screen.screenshot(
-                        filepath="{}test-{}.png".format(tl.dir_path, str(tl.num_screenshots)))
+                        filepath="{}{}-{}.{}".format(tl.dir_path, tl.output_name, str(tl.num_screenshots), tl.file_format))
                 except RuntimeError:
                     self.report({"ERROR"}, tl.dir_path + " is invalid!")
                     bpy.ops.timelapse.end_modal_operator()

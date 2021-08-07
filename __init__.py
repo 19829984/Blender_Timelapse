@@ -10,7 +10,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-from . import properties, ui, timelapse
+from . import properties, ui, timelapse, preferences
 import bpy
 from bpy.app.handlers import persistent
 
@@ -26,7 +26,7 @@ bl_info = {
 }
 
 
-modules = {properties, timelapse, ui}
+modules = {properties, timelapse, ui, preferences}
 
 @persistent
 def check_timelapse_is_running_and_prompt(dummy):
@@ -36,21 +36,22 @@ def check_timelapse_is_running_and_prompt(dummy):
         if tl is not None:
             if tl.get('is_running') == True:
                 print("Timelapse already running")
-                if tl.get('remembered_choice') is not None:
-                    print("Choice", tl.get('remembered_choice'))
-                    if tl['remembered_choice'] == 1: #auto_resume
-                        print("Autoresume detected")
-                        tl['is_running'] = False #So that the modal will run
-                        bpy.ops.timelapse.start_modal_operator()
-                    elif tl['remembered_choice'] == 0: #no memory
-                        print("No memory")
+
+                if tl.get('remind_resume') is not None:
+                    print("Checking reminder")
+                    if tl.get('remind_resume'):
                         bpy.ops.wm.timelapse_remind("INVOKE_DEFAULT")
-                    break
+                        break
+                    else:
+                        if tl.get('auto_resume') is not None:
+                            bpy.ops.timelapse.end_modal_operator() #So that the modal will run if needed
+                            if tl.get('auto_resume'):
+                                print("Autoresume detected")
+                                bpy.ops.timelapse.start_modal_operator()
+                            break
                 else:
-                    print("No memory")
                     bpy.ops.wm.timelapse_remind("INVOKE_DEFAULT")
                     break
-
 
 
 
