@@ -37,6 +37,7 @@ class OUTPUT_PT_timelapse_panel(bpy.types.Panel):
         col.alignment="RIGHT"
         col.separator(factor=0.5)
         col.operator(create_timelapse.bl_idname, text="Create Timelapse Clip")
+        row.enabled = not tl.is_running
 
 class OUTPUT_PT_timelapse_settings_panel(bpy.types.Panel):
     bl_idname = "OUTPUT_PT_timelapse_settings_panel"

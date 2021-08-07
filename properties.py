@@ -1,5 +1,22 @@
 import bpy
+import os
+from re import search
 from .utils import registration
+
+def update_counter_on_dir_change(self, context):
+    tl = context.scene.tl
+
+    screenshots = os.listdir(tl.dir_path)
+    if len(screenshots) == 0:
+        tl.num_screenshots = 0
+
+    last_screenshot_num = 0
+
+    for screenshot in screenshots:
+        screenshot_num = search('(\d*)\..*$', screenshot)
+        last_screenshot_num = max(last_screenshot_num, int(screenshot_num.group(1)))
+    
+    tl.num_screenshots = last_screenshot_num + 1
 
 class Timelapse_Addon_Properties(bpy.types.PropertyGroup):
     seconds_per_frame: bpy.props.FloatProperty(
@@ -54,8 +71,8 @@ class Timelapse_Addon_Properties(bpy.types.PropertyGroup):
         name="",
         description="timelapse screenshot output directory path",
         default="//timelapse_screenshots/",
-        # maxlen=1024,
-        subtype='DIR_PATH'
+        subtype='DIR_PATH',
+        update=update_counter_on_dir_change
     )
 
     is_running: bpy.props.BoolProperty(
