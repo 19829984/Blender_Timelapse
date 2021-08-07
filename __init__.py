@@ -10,7 +10,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-from . import properties, ui, timelapse, preferences
+from . import properties, ui, timelapse, preferences, video
 import bpy
 from bpy.app.handlers import persistent
 
@@ -26,7 +26,7 @@ bl_info = {
 }
 
 
-modules = {properties, timelapse, ui, preferences}
+modules = {properties, timelapse, ui, preferences, video}
 
 @persistent
 def check_timelapse_is_running_and_prompt(dummy):
@@ -62,6 +62,7 @@ def register():
 
 
 def unregister():
+    bpy.ops.timelapse.end_modal_operator()
     for module in modules:
         module.unregister()
     bpy.app.handlers.load_post.remove(check_timelapse_is_running_and_prompt)

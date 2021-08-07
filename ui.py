@@ -6,6 +6,8 @@ from typing import Optional
 from bpy.types import STATUSBAR_HT_header
 from .timelapse import Timelapse_OT_start_timelapse_modal_operator as timelapse_ot_start
 from .timelapse import Timelapse_OT_end_timelapse_modal_operator as timelapse_ot_end
+from .video import TIMELAPSE_OT_create_timelapse_clip as create_timelapse
+from .utils import registration
 
 original_status_bar_draw = copy.deepcopy(bpy.types.STATUSBAR_HT_header.draw)
 custom_icons: Optional[bpy.utils.previews.ImagePreviewCollection] = None
@@ -13,7 +15,33 @@ custom_icons: Optional[bpy.utils.previews.ImagePreviewCollection] = None
 
 class OUTPUT_PT_timelapse_panel(bpy.types.Panel):
     bl_idname = "OUTPUT_PT_timelapse_panel"
-    bl_label = "Timelapse Panel"
+    bl_label = "Timelapse"
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context = "output"
+
+    def draw(self, context):
+        layout = self.layout
+        tl = context.scene.tl
+        
+        row = layout.row(align=True)
+        row.operator(timelapse_ot_start.bl_idname, text="Start Timelapse")
+        row.operator(timelapse_ot_end.bl_idname, text="End Timelapse")
+
+        row = layout.row()
+        box = row.box()
+        box.alignment="LEFT"
+        box.label(text="#Screenshots so far: {}".format(tl.num_screenshots))
+
+        col = row.column()
+        col.alignment="RIGHT"
+        col.separator(factor=0.5)
+        col.operator(create_timelapse.bl_idname, text="Create Timelapse Clip")
+
+class OUTPUT_PT_timelapse_settings_panel(bpy.types.Panel):
+    bl_idname = "OUTPUT_PT_timelapse_settings_panel"
+    bl_parent_id = "OUTPUT_PT_timelapse_panel"
+    bl_label = "Timelapse Settings"
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
     bl_context = "output"
@@ -24,9 +52,6 @@ class OUTPUT_PT_timelapse_panel(bpy.types.Panel):
 
         row = layout.row(align=True)
         row.label(text="Path to timelapse output:")
-        row.label(text="#Screenshots so far: {}".format(tl.num_screenshots))
-        
-        row = layout.row(align=True)
         row.prop(tl, "dir_path")
         row.enabled = not tl.is_running
 
@@ -35,7 +60,7 @@ class OUTPUT_PT_timelapse_panel(bpy.types.Panel):
         row.enabled = not tl.is_running
 
         row = layout.row(align=True)
-        row.prop(tl, "file_format")
+        row.prop(tl, "file_format", icon="FILE_IMAGE")
         row.enabled = not tl.is_running
 
         row = layout.row(align=True)
@@ -43,9 +68,7 @@ class OUTPUT_PT_timelapse_panel(bpy.types.Panel):
         row.prop(tl, 'seconds_per_frame')
         row.enabled = not tl.is_running
 
-        row = layout.row(align=True)
-        row.operator(timelapse_ot_start.bl_idname, text="Start Timelapse")
-        row.operator(timelapse_ot_end.bl_idname, text="End Timelapse")
+
 
 class WM_OT_If_Timelapse_On_Remind(bpy.types.Operator):
     bl_label = "Resume timelapse recording from previous session?"
@@ -99,21 +122,20 @@ def draw_timelapse_indicator(self, context):
         row.label(text='Timelapse OFF',
                   icon_value=custom_icons['timelapse_icon_off'].icon_id)
 
+classes = [OUTPUT_PT_timelapse_panel, OUTPUT_PT_timelapse_settings_panel, WM_OT_If_Timelapse_On_Remind]
 
 def register():
     # Icon
     register_icon()
-    STATUSBAR_HT_header.prepend(draw_timelapse_indicator)
     # UI
-    bpy.utils.register_class(OUTPUT_PT_timelapse_panel)
-    bpy.utils.register_class(WM_OT_If_Timelapse_On_Remind)
+    registration.register_classes(classes)
+    STATUSBAR_HT_header.prepend(draw_timelapse_indicator)
 
 
 def unregister():
     # UI
-    bpy.utils.unregister_class(WM_OT_If_Timelapse_On_Remind)
-    bpy.utils.unregister_class(OUTPUT_PT_timelapse_panel)
     STATUSBAR_HT_header.draw = original_status_bar_draw
+    registration.unregister_classes(classes)
     # Icon
     unregister_icon()
 

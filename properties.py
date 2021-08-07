@@ -1,4 +1,5 @@
 import bpy
+from .utils import registration
 
 class Timelapse_Addon_Properties(bpy.types.PropertyGroup):
     seconds_per_frame: bpy.props.FloatProperty(
@@ -12,7 +13,7 @@ class Timelapse_Addon_Properties(bpy.types.PropertyGroup):
 
     output_name: bpy.props.StringProperty(
         name="Output Name",
-        description="Name of the output files",
+        description="Name of the output files, no extensions",
         default='timelapse-screenshot'
     )
 
@@ -30,7 +31,8 @@ class Timelapse_Addon_Properties(bpy.types.PropertyGroup):
 
     num_screenshots: bpy.props.IntProperty(
         name="",
-        default=0
+        default=0,
+        min=0
     )
 
     screenshot_is_due: bpy.props.BoolProperty(
@@ -51,7 +53,7 @@ class Timelapse_Addon_Properties(bpy.types.PropertyGroup):
     dir_path: bpy.props.StringProperty(
         name="",
         description="timelapse screenshot output directory path",
-        default="./timelapse_screenshots",
+        default="//timelapse_screenshots/",
         # maxlen=1024,
         subtype='DIR_PATH'
     )
@@ -61,15 +63,16 @@ class Timelapse_Addon_Properties(bpy.types.PropertyGroup):
         default=False
     )
 
+classes = [Timelapse_Addon_Properties]
 
 def register():
     # Properties
-    bpy.utils.register_class(Timelapse_Addon_Properties)
+    registration.register_classes(classes)
     bpy.types.Scene.tl = bpy.props.PointerProperty(
         type=Timelapse_Addon_Properties)
 
 
 def unregister():
     # Properties
-    bpy.utils.unregister_class(Timelapse_Addon_Properties)
+    registration.unregister_classes(classes)
     del bpy.types.Scene.tl

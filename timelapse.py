@@ -1,6 +1,7 @@
 import bpy
 import functools
 from .events import events
+from .utils import registration
 
 def screenshot_timer(tl, seconds):
     tl.screenshot_is_due = True
@@ -107,10 +108,8 @@ classes = [Timelapse_OT_start_timelapse_modal_operator,
 
 def register():
     print("Registering timelapse")
-    for cls in classes:
-        bpy.utils.register_class(cls)
+    registration.register_classes(classes)
 
 
 def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
+    registration.unregister_classes(classes)
