@@ -15,14 +15,14 @@ import bpy
 from bpy.app.handlers import persistent
 
 bl_info = {
-    "name": "Time_Lapse_Alpha",
+    "name": "Timelapse",
     "author": "Bowen Wu",
-    "description": "Alpha version of addon to automatically record a timelapse of your project",
-    "blender": (2, 90, 0),
-    "version": (0, 0, 1),
+    "description": "Automatically record a timelapse of your project and create a video clip of it in blender",
+    "blender": (2, 80, 3),
+    "version": (0, 1, 1),
     "location": "",
     "warning": "",
-    "category": "User"
+    "category": "Video Tools"
 }
 
 
