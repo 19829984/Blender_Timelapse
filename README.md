@@ -22,4 +22,6 @@ Once a timelapse has been created, you can either import the image sequence into
 To do so, simply click **Create Timelapse Clip**
 
 # Limitations
-Because the addon uses Blender's built in screenshot function, it will not capture anything other than the Blender window in which you've started the timelapse from. Therefore, it will not capture any other applications, nor will it capture any additional windows of Blender. 
+Because the addon uses Blender's built in screenshot function, it will not capture anything not connected to the Blender window in which you've started the timelapse from. Therefore, it will not capture any other applications either.  
+
+However, you can kind of get around the multiple Blender window limitation by extending the main window and dividing your existing windows. 
