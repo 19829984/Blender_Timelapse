@@ -32,13 +32,10 @@ modules = {properties, timelapse, ui, preferences, video}
 def check_timelapse_is_running_and_prompt(dummy):
     for scene in bpy.data.scenes:
         tl = scene.get('tl', None)
-        print(tl.keys())
         if tl is not None:
             if tl.get('is_running') == True:
-                print("Timelapse already running")
 
                 if tl.get('remind_resume') is not None:
-                    print("Checking reminder")
                     if tl.get('remind_resume'):
                         bpy.ops.wm.timelapse_remind("INVOKE_DEFAULT")
                         break
@@ -46,7 +43,6 @@ def check_timelapse_is_running_and_prompt(dummy):
                         if tl.get('auto_resume') is not None:
                             bpy.ops.timelapse.end_modal_operator() #So that the modal will run if needed
                             if tl.get('auto_resume'):
-                                print("Autoresume detected")
                                 bpy.ops.timelapse.start_modal_operator()
                             break
                 else:

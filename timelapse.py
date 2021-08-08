@@ -6,7 +6,6 @@ from .utils import registration
 
 def screenshot_timer(tl, seconds):
     tl.screenshot_is_due = True
-    print("Screenshot time")
     return seconds
 
 
@@ -32,8 +31,8 @@ class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
             if tl.screenshot_is_due:
                 self.report(
                     {"INFO"}, ("Taking {}th screenshot".format(tl.num_screenshots)))
-                if not os.path.isdir(tl.dir_path):
-                    abs_path = bpy.path.abspath(tl.dir_path)
+                abs_path = bpy.path.abspath(tl.dir_path)
+                if not os.path.isdir(abs_path):
                     self.report({"INFO"}, ("{} does not exist, creating folder".format(abs_path)))
                     try:
                         os.mkdir(abs_path)
@@ -45,7 +44,7 @@ class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
                     bpy.ops.screen.screenshot(
                         filepath="{}{}-{}.{}".format(tl.dir_path, tl.output_name, str(tl.num_screenshots), tl.file_format))
                 except RuntimeError:
-                    self.report({"ERROR"}, tl.dir_path + " is invalid! Check your permissions")
+                    self.report({"ERROR"}, abs_path + " is invalid! Check your permissions")
                     bpy.ops.timelapse.end_modal_operator()
                     return {'FINISHED'}
                 tl.num_screenshots += 1
@@ -69,7 +68,6 @@ class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
         self.report({"INFO"}, "Timelapse started")
 
         
-        print("Registering timer with: " + str(tl.seconds_per_frame))
         if start_modal_cls.registered_timer_func is not None and bpy.app.timers.is_registered(start_modal_cls.registered_timer_func):
             bpy.app.timers.unregister(
                 start_modal_cls.registered_timer_func)
@@ -101,7 +99,6 @@ class Timelapse_OT_end_timelapse_modal_operator(bpy.types.Operator):
         start_modal_cls = Timelapse_OT_start_timelapse_modal_operator
         
         if start_modal_cls.registered_timer_func is not None and bpy.app.timers.is_registered(start_modal_cls.registered_timer_func):
-            print("Unregistered timer")
             bpy.app.timers.unregister(
                 start_modal_cls.registered_timer_func)
 
@@ -120,7 +117,6 @@ classes = [Timelapse_OT_start_timelapse_modal_operator,
 
 
 def register():
-    print("Registering timelapse")
     registration.register_classes(classes)
 
 
