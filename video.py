@@ -8,15 +8,24 @@ class TIMELAPSE_OT_create_timelapse_clip(bpy.types.Operator):
     bl_label = "Create Timelapse Clip"
 
     def execute(self, context):
+        if not bpy.data.is_saved:
+            self.report({"ERROR"}, "File hasn't been saved yet, please save and try again")
+            return {"FINISHED"}
         tl = context.scene.tl
+        
+        screenshot_abs_path = bpy.path.abspath(tl.dir_path)
+        
+        if not os.path.isdir(screenshot_abs_path):
+            self.report({"ERROR"}, "No screenshots exist at {}, record a timelapse and try again.".format(screenshot_abs_path))
+            return {"FINISHED"}
 
         if "Video Editing" in bpy.data.workspaces.keys():
             context.window.workspace = bpy.data.workspaces['Video Editing']
         elif context.workspace.name != "Video Editing":
             video_editor_ws_path = next(bpy.utils.app_template_paths()) + '/Video_Editing' + '/startup.blend'
             bpy.ops.workspace.append_activate(idname="Video Editing", filepath=str(video_editor_ws_path))
-            
-        screenshots = set(os.listdir(tl.dir_path))
+
+        screenshots = set(os.listdir(screenshot_abs_path))
 
         timelapse_strip = context.scene.sequence_editor.sequences.new_image(
             name="Timelapse Sequence",

@@ -35,12 +35,17 @@ class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
                 if not os.path.isdir(tl.dir_path):
                     abs_path = bpy.path.abspath(tl.dir_path)
                     self.report({"INFO"}, ("{} does not exist, creating folder".format(abs_path)))
-                    os.mkdir(abs_path)
+                    try:
+                        os.mkdir(abs_path)
+                    except PermissionError as err:
+                        self.report({"ERROR"}, err)
+                        bpy.ops.timelapse.end_modal_operator()
+                        return {'FINISHED'}
                 try:
                     bpy.ops.screen.screenshot(
                         filepath="{}{}-{}.{}".format(tl.dir_path, tl.output_name, str(tl.num_screenshots), tl.file_format))
                 except RuntimeError:
-                    self.report({"ERROR"}, tl.dir_path + " is invalid!")
+                    self.report({"ERROR"}, tl.dir_path + " is invalid! Check your permissions")
                     bpy.ops.timelapse.end_modal_operator()
                     return {'FINISHED'}
                 tl.num_screenshots += 1
@@ -49,6 +54,9 @@ class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
         return {'PASS_THROUGH'}
 
     def execute(self, context):
+        if not bpy.data.is_saved:
+            self.report({"ERROR"}, "File hasn't been saved yet, please save and try again")
+            return {"FINISHED"}
         tl = context.scene.tl
 
         if tl.is_running:
