@@ -46,6 +46,11 @@ class Timelapse_Addon_Properties(bpy.types.PropertyGroup):
         default='png'
     )
 
+    enable_screenshot_notification: bpy.props.BoolProperty(
+        name="",
+        default=False
+    )
+
     num_screenshots: bpy.props.IntProperty(
         name="",
         default=0,

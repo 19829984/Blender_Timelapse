@@ -19,7 +19,11 @@ class TimelapsePreferences(AddonPreferences):
         row.enabled = not tl.auto_resume
         
         row=layout.row(align=True)
+        row.prop(tl, "enable_screenshot_notification", text="[DEBUG]Enable screenshot taken notification")
+
+        row=layout.row(align=True)
         row.prop(tl, "num_screenshots", text="Change the screenshot counter (used in output suffix)")
+
             
 classes = [TimelapsePreferences]
 

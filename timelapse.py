@@ -29,8 +29,9 @@ class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
 
         if event.type in events:
             if tl.screenshot_is_due:
-                self.report(
-                    {"INFO"}, ("Taking {}th screenshot".format(tl.num_screenshots)))
+                if tl.enable_screenshot_notification:
+                    self.report(
+                        {"INFO"}, ("Taking {}th screenshot".format(tl.num_screenshots)))
                 abs_path = bpy.path.abspath(tl.dir_path)
                 if not os.path.isdir(abs_path):
                     self.report({"INFO"}, ("{} does not exist, creating folder".format(abs_path)))
