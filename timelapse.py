@@ -1,5 +1,6 @@
 import bpy
 import functools
+import os
 from .events import events
 from .utils import registration
 
@@ -31,6 +32,10 @@ class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
             if tl.screenshot_is_due:
                 self.report(
                     {"INFO"}, ("Taking {}th screenshot".format(tl.num_screenshots)))
+                if not os.path.isdir(tl.dir_path):
+                    abs_path = bpy.path.abspath(tl.dir_path)
+                    self.report({"INFO"}, ("{} does not exist, creating folder".format(abs_path)))
+                    os.mkdir(abs_path)
                 try:
                     bpy.ops.screen.screenshot(
                         filepath="{}{}-{}.{}".format(tl.dir_path, tl.output_name, str(tl.num_screenshots), tl.file_format))
