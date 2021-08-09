@@ -7,8 +7,10 @@ def update_counter_on_dir_change(self, context):
     tl = context.scene.tl
 
     screenshots = os.listdir(bpy.path.abspath(tl.dir_path))
+    print(len(screenshots))
     if len(screenshots) == 0:
         tl.num_screenshots = 0
+        return
 
     last_screenshot_num = 0
 

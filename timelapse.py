@@ -11,8 +11,8 @@ def screenshot_timer(tl, seconds):
 
 class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
     bl_idname = "timelapse.start_modal_operator"
-    bl_description = "Start or Stop the timelapse recording"
-    bl_label = "Timelapse Modal Operator"
+    bl_description = "Start the timelapse recording"
+    bl_label = "Start Timelapse"
 
     registered_timer_func = None
 
@@ -39,14 +39,15 @@ class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
                         os.mkdir(abs_path)
                     except PermissionError as err:
                         self.report({"ERROR"}, err)
-                        bpy.ops.timelapse.end_modal_operator()
+                        bpy.ops.timelapse.pause_modal_operator()
                         return {'FINISHED'}
                 try:
                     bpy.ops.screen.screenshot(
-                        filepath="{}{}-{}.{}".format(tl.dir_path, tl.output_name, str(tl.num_screenshots), tl.file_format))
+                        filepath="{}{}-{}.{}".format(tl.dir_path, tl.output_name, str(tl.num_screenshots), tl.file_format),
+                        check_existing = True)
                 except RuntimeError:
                     self.report({"ERROR"}, abs_path + " is invalid! Check your permissions")
-                    bpy.ops.timelapse.end_modal_operator()
+                    bpy.ops.timelapse.pause_modal_operator()
                     return {'FINISHED'}
                 tl.num_screenshots += 1
                 tl.screenshot_is_due = False
@@ -83,15 +84,12 @@ class Timelapse_OT_start_timelapse_modal_operator(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
 
-class Timelapse_OT_end_timelapse_modal_operator(bpy.types.Operator):
-    bl_idname = "timelapse.end_modal_operator"
-    bl_description = "Start or Stop the timelapse recording"
-    bl_label = "Timelapse Modal Operator"
+class Timelapse_OT_pause_timelapse_modal_operator(bpy.types.Operator):
+    bl_idname = "timelapse.pause_modal_operator"
+    bl_description = "Pause the timelapse recording"
+    bl_label = "Pause Timelapse"
 
     registered_timer_func = None
-
-    def __init__(self):
-        self.report({'INFO'}, "Ending Timelapse")
 
 
     def execute(self, context):
@@ -105,15 +103,28 @@ class Timelapse_OT_end_timelapse_modal_operator(bpy.types.Operator):
 
         if tl.is_running:
             tl.is_running = False
-            self.report({"INFO"}, "Timelapse cancelled")
+            self.report({"INFO"}, "Timelapse paused")
             return {'FINISHED'}
                 
         self.report({'WARNING'}, "No timelapse is being recorded.")
         return {'FINISHED'}
 
 
+class Timelapse_OT_end_timelapse_modal_operator(bpy.types.Operator):
+    bl_idname = "timelapse.end_modal_operator"
+    bl_description = "End the timelapse recording and reset"
+    bl_label = "End Timelapse"
+
+    def execute(self, context):
+        tl = context.scene.tl
+
+        tl.num_screenshots = 0
+        self.report({"INFO"}, "Timelapse ended")
+        return bpy.ops.timelapse.pause_modal_operator()
+
 classes = [Timelapse_OT_start_timelapse_modal_operator,
-           Timelapse_OT_end_timelapse_modal_operator]
+            Timelapse_OT_pause_timelapse_modal_operator,
+            Timelapse_OT_end_timelapse_modal_operator]
 
 
 

@@ -5,6 +5,7 @@ import bpy.utils.previews
 from typing import Optional
 from bpy.types import STATUSBAR_HT_header
 from .timelapse import Timelapse_OT_start_timelapse_modal_operator as timelapse_ot_start
+from .timelapse import Timelapse_OT_pause_timelapse_modal_operator as timelapse_ot_pause
 from .timelapse import Timelapse_OT_end_timelapse_modal_operator as timelapse_ot_end
 from .video import TIMELAPSE_OT_create_timelapse_clip as create_timelapse
 from .utils import registration
@@ -26,6 +27,7 @@ class OUTPUT_PT_timelapse_panel(bpy.types.Panel):
         
         row = layout.row(align=True)
         row.operator(timelapse_ot_start.bl_idname, text="Start Timelapse")
+        row.operator(timelapse_ot_pause.bl_idname, text="Pause Timelapse")
         row.operator(timelapse_ot_end.bl_idname, text="End Timelapse")
 
         row = layout.row()
@@ -83,7 +85,7 @@ class WM_OT_If_Timelapse_On_Remind(bpy.types.Operator):
     def execute(self, context):
         tl = context.scene.tl
         if self.resume_timelapse:
-            bpy.ops.timelapse.end_modal_operator()
+            bpy.ops.timelapse.pause_modal_operator()
             bpy.ops.timelapse.start_modal_operator()
             
         if self.dont_remind_me:
@@ -104,7 +106,7 @@ class WM_OT_If_Timelapse_On_Remind(bpy.types.Operator):
 
     def invoke(self, context, event):
         if context.scene.tl.is_running:
-            bpy.ops.timelapse.end_modal_operator()
+            bpy.ops.timelapse.pause_modal_operator()
             return context.window_manager.invoke_props_dialog(self)
         return {'FINISHED'}
 

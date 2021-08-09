@@ -41,7 +41,7 @@ def check_timelapse_is_running_and_prompt(dummy):
                         break
                     else:
                         if tl.get('auto_resume') is not None:
-                            bpy.ops.timelapse.end_modal_operator() #So that the modal will run if needed
+                            bpy.ops.timelapse.pause_modal_operator() #So that the modal will run if needed
                             if tl.get('auto_resume'):
                                 bpy.ops.timelapse.start_modal_operator()
                             break
@@ -58,7 +58,7 @@ def register():
 
 
 def unregister():
-    bpy.ops.timelapse.end_modal_operator()
+    bpy.ops.timelapse.pause_modal_operator()
     for module in modules:
         module.unregister()
     bpy.app.handlers.load_post.remove(check_timelapse_is_running_and_prompt)
