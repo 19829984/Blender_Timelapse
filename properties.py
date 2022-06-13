@@ -59,11 +59,6 @@ class Timelapse_Addon_Properties(bpy.types.PropertyGroup):
         min=0
     )
 
-    screenshot_is_due: bpy.props.BoolProperty(
-        name="",
-        default=False
-    )
-
     remind_resume: bpy.props.BoolProperty(
         name="",
         default=True
