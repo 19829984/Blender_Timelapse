@@ -10,8 +10,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-from . import properties, ui, timelapse, preferences, video
 import bpy
+
+#Check if addon is being reloaded
+if "timelapse" not in locals():
+    from . import properties, ui, timelapse, preferences, video
+else:
+    import importlib
+    properties = importlib.reload(properties)
+    ui = importlib.reload(ui)
+    timelapse = importlib.reload(timelapse)
+    preferences = importlib.reload(preferences)
+    video = importlib.reload(video)
 from bpy.app.handlers import persistent
 
 bl_info = {

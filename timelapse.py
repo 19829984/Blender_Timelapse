@@ -5,11 +5,9 @@ from .utils import registration
 
 def screenshot_timer(context, report, seconds):
     tl = context.scene.tl
-    print("Timer Running")
     if not tl.is_running:
-        print("Timer stopped")
         return None
-    print("Runing capture")
+        
     if tl.enable_screenshot_notification:
         report(
             {"INFO"}, ("Taking {}th screenshot".format(tl.num_screenshots)))
