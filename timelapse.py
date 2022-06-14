@@ -6,6 +6,7 @@ from .utils import registration
 def screenshot_timer(context, report, seconds):
     tl = context.scene.tl
     if not tl.is_running:
+        print("Timelapse Stopped")
         return None
         
     if tl.enable_screenshot_notification:

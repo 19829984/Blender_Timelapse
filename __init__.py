@@ -51,7 +51,7 @@ def check_timelapse_is_running_and_prompt(dummy):
                         break
                     else:
                         if tl.get('auto_resume') is not None:
-                            bpy.ops.timelapse.pause_operator() #So that the modal will run if needed
+                            bpy.ops.timelapse.pause_operator() #So that the timelapse will run if needed
                             if tl.get('auto_resume'):
                                 bpy.ops.timelapse.start_operator()
                             break
