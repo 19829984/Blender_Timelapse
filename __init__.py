@@ -29,7 +29,7 @@ bl_info = {
     "author": "Bowen Wu",
     "description": "Automatically record a timelapse of your project and create a video clip of it in blender",
     "blender": (2, 80, 3),
-    "version": (0, 2, 0),
+    "version": (1, 0, 0),
     "location": "",
     "warning": "",
     "category": "Video Tools"
