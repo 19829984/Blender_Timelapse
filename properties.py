@@ -2,6 +2,7 @@ import bpy
 import os
 from re import search
 from .utils import registration
+from bpy.app.handlers import persistent
 
 
 def update_counter_on_dir_change(self, context):
@@ -31,7 +32,7 @@ def update_counter_on_dir_change(self, context):
 # https://blenderartists.org/t/prevent-panel-from-receiving-undo-hotkey-event/1192545/9
 # Needed so that undo/redo does not affect these attributes for the sake of consistent operation
 
-
+@persistent
 def restore_tl_props(scene):
     """
     Restore timelapse properties' data if they've been changed

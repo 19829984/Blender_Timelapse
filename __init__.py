@@ -37,7 +37,7 @@ bl_info = {
 }
 
 
-modules = {properties, timelapse, ui, preferences, video}
+modules = [properties, timelapse, ui, preferences, video]
 
 
 @persistent
@@ -74,5 +74,5 @@ def register():
 def unregister():
     bpy.ops.timelapse.pause_operator()
     bpy.app.handlers.load_post.remove(check_timelapse_is_running_and_prompt)
-    for module in modules:
+    for module in modules[::-1]:
         module.unregister()
