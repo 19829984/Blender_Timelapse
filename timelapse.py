@@ -26,7 +26,7 @@ def screenshot_timer(context, report, seconds):
     try:
         bpy.ops.screen.screenshot(
             filepath="{}{}-{}.{}".format(tl.dir_path, tl.output_name,
-                                         str(tl.num_screenshots), tl.file_format),
+                                         str(tl.num_screenshots).zfill(4), tl.file_format),
             check_existing=True)
     except RuntimeError:
         report({"ERROR"}, abs_path +
