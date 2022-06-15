@@ -5,10 +5,15 @@ from .utils import registration
 
 
 def update_counter_on_dir_change(self, context):
+    """
+    Update num_screenshots based on the number of existing
+    screenshots in the output directory
+    """
     tl = context.scene.tl
 
     screenshots = os.listdir(bpy.path.abspath(tl.dir_path))
-    print(len(screenshots))
+
+    # Exit early if there's nothing there
     if len(screenshots) == 0:
         tl.num_screenshots = 0
         return
@@ -22,12 +27,24 @@ def update_counter_on_dir_change(self, context):
 
     tl.num_screenshots = last_screenshot_num + 1
 
-# Code adapted from https://blenderartists.org/t/prevent-panel-from-receiving-undo-hotkey-event/1192545/9
-# Needed so that undo/redo does not affect these two attributes for the sake of consistent operation
+# Code for the two functions below are adapted from
+# https://blenderartists.org/t/prevent-panel-from-receiving-undo-hotkey-event/1192545/9
+# Needed so that undo/redo does not affect these attributes for the sake of consistent operation
 
 
 def restore_tl_props(scene):
+    """
+    Restore timelapse properties' data if they've been changed
+    during a undo/redo
+
+    is_running and num_screenshots are always restored
+    other properties are only restored when a timelapse is running
+    """
     def restore_tl_prop(prop_name):
+        """
+        Restore timelapse property with the name "prop_name" if it's different
+        from what is currently stored within Blender's data
+        """
         stored_prop = getattr(restore_tl_props, prop_name, None)
         current_prop = getattr(scene.tl, prop_name, None)
         if stored_prop is not None and current_prop != stored_prop:
@@ -47,6 +64,12 @@ def restore_tl_props(scene):
 
 
 def store_tl_props(self, context, prop_name):
+    """
+    Store timelapse property as an attribute within 'restore_tl_props'
+
+    Used as update function for properties to store its data before
+    an undo/redo finishes. 
+    """
     prop_to_store = getattr(self, prop_name, None)
     setattr(restore_tl_props, prop_name, prop_to_store)
 
@@ -115,6 +138,10 @@ class Timelapse_Addon_Properties(bpy.types.PropertyGroup):
     )
 
     def dir_path_update_func(self, context):
+        """
+        Cannot use lambda to call two different functions for dir_path,
+        so we just define a simple function here instead
+        """
         store_tl_props(self, context, "dir_path")
         update_counter_on_dir_change(self, context)
 

@@ -5,15 +5,23 @@ from .utils import registration
 
 
 def screenshot_timer(context, report, seconds):
+    """
+    Take a screenshot once every `seconds` and increment 'num_screenshots' property
+
+    Create the directory for the screenshot if it does not exist yet
+    """
     tl = context.scene.tl
     if not tl.is_running:
-        print("Timelapse Stopped")
+        report({"INFO"}, ("Timelapse Stopped"))
         return None
 
     if tl.enable_screenshot_notification:
         report(
             {"INFO"}, ("Taking {}th screenshot".format(tl.num_screenshots)))
+
     abs_path = bpy.path.abspath(tl.dir_path)
+
+    # Create folder to store screenshots if it doesn't exist
     if not os.path.isdir(abs_path):
         report(
             {"INFO"}, ("{} does not exist, creating folder".format(abs_path)))
@@ -23,6 +31,8 @@ def screenshot_timer(context, report, seconds):
             report({"ERROR"}, err)
             bpy.ops.timelapse.pause_operator()
             return None
+
+    # Take screenshot
     try:
         bpy.ops.screen.screenshot(
             filepath="{}{}-{}.{}".format(tl.dir_path, tl.output_name,
@@ -33,6 +43,7 @@ def screenshot_timer(context, report, seconds):
                " is invalid! Check your permissions")
         bpy.ops.timelapse.pause_operator()
         return None
+
     tl.num_screenshots += 1
 
     return seconds

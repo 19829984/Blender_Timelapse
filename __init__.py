@@ -11,8 +11,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 import bpy
+from bpy.app.handlers import persistent
 
-#Check if addon is being reloaded
+# Check if addon is being reloaded
+# This also allows script.reload() to reload the addon
 if "timelapse" not in locals():
     from . import properties, ui, timelapse, preferences, video
 else:
@@ -22,7 +24,6 @@ else:
     timelapse = importlib.reload(timelapse)
     preferences = importlib.reload(preferences)
     video = importlib.reload(video)
-from bpy.app.handlers import persistent
 
 bl_info = {
     "name": "Timelapse",
@@ -38,27 +39,30 @@ bl_info = {
 
 modules = {properties, timelapse, ui, preferences, video}
 
+
 @persistent
-def check_timelapse_is_running_and_prompt(dummy):
+def check_timelapse_is_running_and_prompt(_):
+    """
+    If timelapse is already running (is_running == True), then prompt the user
+    upon loading the file whether they'd like to continue the timelapse.
+    """
     for scene in bpy.data.scenes:
         tl = scene.get('tl', None)
         if tl is not None:
-            if tl.get('is_running') == True:
-
+            if tl.get('is_running'):
                 if tl.get('remind_resume') is not None:
                     if tl.get('remind_resume'):
                         bpy.ops.wm.timelapse_remind("INVOKE_DEFAULT")
                         break
                     else:
                         if tl.get('auto_resume') is not None:
-                            bpy.ops.timelapse.pause_operator() #So that the timelapse will run if needed
+                            bpy.ops.timelapse.pause_operator()  # So that the timelapse will run if needed
                             if tl.get('auto_resume'):
                                 bpy.ops.timelapse.start_operator()
                             break
                 else:
                     bpy.ops.wm.timelapse_remind("INVOKE_DEFAULT")
                     break
-
 
 
 def register():
