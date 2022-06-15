@@ -24,6 +24,8 @@ def update_counter_on_dir_change(self, context):
 
 # Code adapted from https://blenderartists.org/t/prevent-panel-from-receiving-undo-hotkey-event/1192545/9
 # Needed so that undo/redo does not affect these two attributes for the sake of consistent operation
+
+
 def restore_tl_props(scene):
     def restore_tl_prop(prop_name):
         stored_prop = getattr(restore_tl_props, prop_name, None)
@@ -145,8 +147,8 @@ def register():
 
 
 def unregister():
-    # Properties
-    registration.unregister_classes(classes)
-    del bpy.types.Scene.tl
-    bpy.app.handlers.undo_post.remove(restore_tl_props)
     bpy.app.handlers.redo_post.remove(restore_tl_props)
+    bpy.app.handlers.undo_post.remove(restore_tl_props)
+    # Properties
+    del bpy.types.Scene.tl
+    registration.unregister_classes(classes)

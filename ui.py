@@ -137,7 +137,7 @@ def register():
 
 def unregister():
     # UI
-    STATUSBAR_HT_header.draw = original_status_bar_draw
+    STATUSBAR_HT_header.remove(draw_timelapse_indicator)
     registration.unregister_classes(classes)
     # Icon
     unregister_icon()
